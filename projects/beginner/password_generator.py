@@ -13,8 +13,8 @@ def get_positive_integer(prompt):
             print("Entrada inválida! Por favor, insira um número inteiro.")  
 
 
-digits = int(input("Quantos dígitos deseja para sua senha: "))
-num_passwords = int(input("Quantas senhas deseja gerar: "))
+digits = get_positive_integer("Quantos dígitos deseja para sua senha: ")
+num_passwords = get_positive_integer("Quantas senhas deseja gerar: ")
 
 for i in range(num_passwords):
     

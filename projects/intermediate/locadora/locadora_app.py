@@ -1,0 +1,1 @@
+from locadora import Locadora, Cliente, Filme

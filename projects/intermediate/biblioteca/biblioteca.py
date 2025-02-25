@@ -9,7 +9,7 @@ class User:
         return f"({self.id_user}) {self.name}"
         
 class Book:
-    def __init__(self, title: str, autor: str, id_book: int, avaliable: bool):
+    def __init__(self, title: str, autor: str, id_book: int):
         self.title = title
         self.autor = autor
         self.id_book = id_book
@@ -34,6 +34,28 @@ class Biblioteca:
     def add_users(self, user: User):
         self.users.append(user)
         self.salvar_dados()
+        
+    def delete_book(self, id_book):
+        book = next((b for b in self.books if b.id_book == id_book), None)
+        
+        if book:
+            self.books.remove(book)
+            print(f"📕 Livro '{book.title}' removido com sucesso.")
+            self.salvar_dados()
+        else:
+            print(f"❌ Nenhum livro encontrado com o ID {id_book}.")
+
+        
+    def delete_user(self, id_user):
+        user = next((u for u in self.users if u.id_user == id_user), None)
+        
+        if user:
+            self.users.remove(user)
+            print(f"👤 Usuário '{user.name}' removido com sucesso.")
+            self.salvar_dados()
+        else:
+            print(f"❌ Nenhum usuário encontrado com o ID {id_user}.")
+
         
     def emprestar_livros(self, id_user, id_book):
         user = next((u for u in self.users if u.id_user == id_user), None)
@@ -69,7 +91,7 @@ class Biblioteca:
             
     def salvar_dados(self):
         dados = {
-            "livros": [{"id": l.id_book, "titulo": l.title, "autor": l.autor, "disponivel": l.avaliable} for l in self.books],
+            "livros": [{"titulo": l.title,"autor": l.autor, "id": l.id_book, "disponivel": l.avaliable} for l in self.books],
             "usuarios": [{"id": u.id_user, "nome": u.name} for u in self.users],
             "emprestimos": self.emprestimos
         }
@@ -77,4 +99,15 @@ class Biblioteca:
         with open (self.arquivo_dados,"w") as file:
             json.dump(dados, file, indent=4)
             
+    def carregar_dados(self):
+        try:
+            with open (self.arquivo_dados, "r") as file:
+                dados = json.load(file)
+                self.books = [Book(l["titulo"], l["autor"], l["id"]) for l in dados["livros"]]
+                for livro, avaliable in zip(self.books, [l["disponivel"] for l in dados["livros"]]):
+                    livro.avaliable = avaliable
+                self.users = [User(u["nome"], u["id"]) for u in dados["usuarios"]]
+                self.emprestimos = dados["emprestimos"]
+        except FileNotFoundError:
+            self.salvar_dados()  
         
